@@ -69,9 +69,78 @@ require = (function (modules, cache, entry) {
 
   // Override the current require with this new one
   return newRequire;
-})({4:[function(require,module,exports) {
+})({15:[function(require,module,exports) {
+"use strict";
 
-},{}],8:[function(require,module,exports) {
+Object.defineProperty(exports, "__esModule", {
+    value: true
+});
+exports.default = {
+    search: function (term, sort, limit) {
+        return fetch(`https://www.reddit.com/search.json?q=${term}&sort=${sort}&limit=${limit}`).then(response => response.json()).then(data => data.data.children.map(data => data.data)).catch(err => cosnole.log(err));
+    }
+};
+},{}],4:[function(require,module,exports) {
+'use strict';
+
+var _redditapi = require('./redditapi');
+
+var _redditapi2 = _interopRequireDefault(_redditapi);
+
+function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { default: obj }; }
+
+const form = document.getElementById('search-form');
+const searchterm = document.getElementById('searchterm');
+
+form.addEventListener('submit', e => {
+    const search_term = searchterm.value;
+    const sortby = document.querySelector("input[name='sortby']:checked").value;
+    const limit = document.getElementById('limit').value;
+    if (search_term === '') {
+        showmessage('Please enter a serach term', 'alert-danger');
+    }
+    _redditapi2.default.search(search_term, sortby, limit).then(results => {
+        console.log(results);
+        var output = '<div class="card-columns">';
+        results.forEach(result => {
+            let image = result.preview ? result.preview.images[0].source.url : 'https://www.affiliatemarketertraining.com/wp-content/uploads/2015/01/Reddit.jpg';
+            output += `
+            <div class="card">
+            <img class="card-img-top" src="${image}" alt="Card image cap">
+            <div class="card-body">
+              <h5 class="card-title">${result.title}</h5>
+              <p class="card-text">${truncate(result.selftext, 70)}</p>
+              <a href="${result.url}" target="_blank" class="btn btn-primary">Read More</a>
+              <hr>
+               <span class="badge badge-secondary">subreddit : ${result.subreddit}</span><br>
+              <span class="badge badge-dark">score : ${result.score}</span>
+            </div>
+          </div>
+            `;
+        });
+        output += '</div>';
+        document.getElementById('results').innerHTML = output;
+    });
+    searchterm.value = '';
+    e.preventDefault();
+});
+
+function showmessage(msg, cls) {
+    var div = document.createElement('div');
+    div.className = `alert ${cls}`;
+    div.innerHTML = msg;
+    const parent = document.getElementById('search-container');
+    const child = document.getElementById('search');
+    parent.insertBefore(div, child);
+
+    setTimeout(() => {
+        document.querySelector(".alert").remove();
+    }, 3000);
+}
+function truncate(str, no_of_words) {
+    return str.split(" ").splice(0, no_of_words).join(" ");
+}
+},{"./redditapi":15}],26:[function(require,module,exports) {
 
 var global = (1, eval)('this');
 var OldModule = module.bundle.Module;
@@ -91,7 +160,7 @@ module.bundle.Module = Module;
 
 if (!module.bundle.parent && typeof WebSocket !== 'undefined') {
   var hostname = '' || location.hostname;
-  var ws = new WebSocket('ws://' + hostname + ':' + '55072' + '/');
+  var ws = new WebSocket('ws://' + hostname + ':' + '62597' + '/');
   ws.onmessage = function (event) {
     var data = JSON.parse(event.data);
 
@@ -192,5 +261,5 @@ function hmrAccept(bundle, id) {
     return hmrAccept(global.require, id);
   });
 }
-},{}]},{},[8,4])
+},{}]},{},[26,4])
 //# sourceMappingURL=/dist/findit.map
